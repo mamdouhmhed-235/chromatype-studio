@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Settings } from "lucide-react"
 
 
+import { WelcomeTour } from "../WelcomeTour"
+
 interface LayoutProps {
     children: ReactNode
     controls: ReactNode
@@ -13,6 +15,7 @@ interface LayoutProps {
 export function Layout({ children, controls }: LayoutProps) {
     return (
         <div className="flex h-screen w-full flex-col overflow-hidden bg-background text-foreground lg:flex-row">
+            <WelcomeTour />
             <FontLoader />
 
             {/* Desktop Sidebar Controls */}
