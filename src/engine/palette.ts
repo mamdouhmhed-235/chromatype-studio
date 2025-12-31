@@ -2,7 +2,7 @@
 import { PRNG } from "./prng"
 import { type HSL, hslToHex, hexToHsl, hslToRgb, getLuminance } from "./color"
 
-export type HarmonyMode = "neutral" | "analogous" | "complementary" | "triadic" | "compound"
+export type HarmonyMode = "neutral" | "analogous" | "complementary" | "triadic" | "compound" | "split-complementary" | "tetradic" | "monochromatic"
 
 export interface PaletteConstraints {
     mode: "light" | "dark" | "random"
@@ -21,11 +21,17 @@ export interface Palette {
     onPrimary: string
     accent: string
     onAccent: string
+    secondary: string // New for tetradic/split
+    onSecondary: string
+    success: string
+    onSuccess: string
+    warning: string
+    onWarning: string
     error: string
     onError: string
+    info: string
+    onInfo: string
 }
-
-const DEFAULT_ERROR = "#ef4444"
 
 export class PaletteGenerator {
     private prng: PRNG
@@ -56,32 +62,22 @@ export class PaletteGenerator {
             : constraints.mode === "dark"
 
         const harmony = constraints.harmony === "random"
-            ? this.prng.pick(["neutral", "analogous", "complementary", "triadic", "compound"]) as HarmonyMode
+            ? this.prng.pick(["neutral", "analogous", "complementary", "triadic", "compound", "split-complementary", "tetradic", "monochromatic"]) as HarmonyMode
             : constraints.harmony
 
         const baseHue = this.prng.range(0, 360)
 
         // 2. Generate Neutrals (Bg, Surface, Text)
-        // Dark mode: Low L for bg. Light mode: High L.
         const bgL = isDark ? this.prng.range(2, 10) : this.prng.range(95, 99)
-        const surfaceL = isDark ? bgL + this.prng.range(5, 10) : bgL - this.prng.range(3, 8) // Surface usually slightly lighter in dark, slightly darker in light (or vice versa depending on elevation style)
-        // Actually, physically, surfaces are often lighter in dark mode (elevation = lightness), 
-        // and in light mode, cards are white (100) on gray (95) OR gray (95) on white (100).
-        // Let's stick to "Card is usually lighter than BG in dark mode". 
-        // In light mode, let's go with "BG is slightly off-white, Surface is white" or "BG white, Surface off-white".
-        // We'll trust the randomness:
+        const surfaceL = isDark ? bgL + this.prng.range(5, 10) : bgL - this.prng.range(3, 8)
 
-        const neutralSat = this.prng.range(0, 10) // Keep neutrals low saturation
-        const neutralHue = baseHue // Tint slightly with base hue
+        const neutralSat = this.prng.range(0, 10)
+        const neutralHue = baseHue
 
         const bg: HSL = { h: neutralHue, s: neutralSat, l: bgL }
         const surface: HSL = { h: neutralHue, s: neutralSat, l: surfaceL }
 
         const textL = isDark ? this.prng.range(85, 98) : this.prng.range(5, 15)
-        // Ensure sufficient contrast
-        // Recalculate if needed? For now, we rely on range. 
-        // 10 vs 90 is usually > 7:1.
-
         const text: HSL = { h: neutralHue, s: this.prng.range(0, 5), l: textL }
         const mutedText: HSL = {
             h: neutralHue,
@@ -97,30 +93,74 @@ export class PaletteGenerator {
         // 3. Generate Accents based on Harmony
         let primaryHue = baseHue
         let accentHue = (baseHue + 180) % 360
+        let secondaryHue = (baseHue + 90) % 360 // Default secondary
 
-        if (harmony === "analogous") {
-            accentHue = (baseHue + 30) % 360
-        } else if (harmony === "triadic") {
-            accentHue = (baseHue + 120) % 360
-        } else if (harmony === "neutral") {
-            accentHue = baseHue
-            primaryHue = baseHue
+        switch (harmony) {
+            case "analogous":
+                accentHue = (baseHue + 30) % 360
+                secondaryHue = (baseHue - 30 + 360) % 360
+                break
+            case "triadic":
+                accentHue = (baseHue + 120) % 360
+                secondaryHue = (baseHue + 240) % 360
+                break
+            case "compound":
+                accentHue = (baseHue + 160) % 360
+                secondaryHue = (baseHue + 20) % 360
+                break
+            case "split-complementary":
+                accentHue = (baseHue + 150) % 360
+                secondaryHue = (baseHue + 210) % 360
+                break
+            case "tetradic":
+                accentHue = (baseHue + 90) % 360
+                secondaryHue = (baseHue + 180) % 360 // Actually tetradic is often 4 colors. We'll reuse accent/secondary logic.
+                // 4th color would be (base+270)
+                break
+            case "monochromatic":
+                accentHue = baseHue
+                secondaryHue = baseHue
+                break
+            case "neutral":
+                accentHue = baseHue
+                primaryHue = baseHue
+                secondaryHue = baseHue
+                break
+            default: // complementary
+                accentHue = (baseHue + 180) % 360
+                secondaryHue = (baseHue + 180) % 360
+                break
         }
 
-        const sat = constraints.saturation === "random" ? this.prng.range(40, 90) : 50 // temp placeholder
+        const sat = constraints.saturation === "random" ? this.prng.range(40, 90) : 50
         const finalSat = this.constrainSaturation(sat, constraints.saturation)
 
-        const primaryL = isDark ? this.prng.range(50, 70) : this.prng.range(40, 60)
-        // Primary needs to be visible.
+        // Luminance logic
+        // Monochromatic needs variance in L, others can share similar L
+        let primaryL = isDark ? this.prng.range(50, 70) : this.prng.range(40, 60)
+        let accentL = isDark ? primaryL + 10 : primaryL + 5
+        let secondaryL = primaryL
+
+        if (harmony === "monochromatic") {
+            accentL = isDark ? primaryL + 20 : primaryL - 20
+            secondaryL = isDark ? primaryL - 20 : primaryL + 20
+        }
 
         const primary: HSL = { h: primaryHue, s: finalSat, l: primaryL }
-        const accent: HSL = { h: accentHue, s: finalSat, l: isDark ? primaryL + 10 : primaryL + 5 }
+        const accent: HSL = { h: accentHue, s: finalSat, l: accentL }
+        const secondary: HSL = { h: secondaryHue, s: finalSat * 0.8, l: secondaryL }
 
-        // 4. Calculate On-Colors
-        const onPrimaryHex = this.getContrastColor(hslToHex(primary))
-        const onAccentHex = this.getContrastColor(hslToHex(accent))
-        const errorHex = DEFAULT_ERROR
-        const onErrorHex = this.getContrastColor(errorHex)
+        // 4. Semantic Colors (Success, Warning, Info, Error)
+        // We ensure they are visible but harmonized if possible? 
+        // Or strictly standard (Green, Orange, Blue, Red)?
+        // Let's standardise hues but match saturation/lightness to the theme atmosphere
+        const semSat = Math.max(finalSat, 60)
+        const semL = isDark ? 65 : 45
+
+        const success: HSL = { h: 142, s: semSat, l: semL }
+        const warning: HSL = { h: 35, s: semSat, l: semL }
+        const info: HSL = { h: 210, s: semSat, l: semL }
+        const error: HSL = { h: 0, s: semSat, l: semL }
 
         return {
             bg: hslToHex(bg),
@@ -129,11 +169,20 @@ export class PaletteGenerator {
             text: hslToHex(text),
             mutedText: hslToHex(mutedText),
             primary: hslToHex(primary),
-            onPrimary: onPrimaryHex,
+            onPrimary: this.getContrastColor(hslToHex(primary)),
             accent: hslToHex(accent),
-            onAccent: onAccentHex,
-            error: errorHex,
-            onError: onErrorHex
+            onAccent: this.getContrastColor(hslToHex(accent)),
+            secondary: hslToHex(secondary),
+            onSecondary: this.getContrastColor(hslToHex(secondary)),
+
+            success: hslToHex(success),
+            onSuccess: this.getContrastColor(hslToHex(success)),
+            warning: hslToHex(warning),
+            onWarning: this.getContrastColor(hslToHex(warning)),
+            info: hslToHex(info),
+            onInfo: this.getContrastColor(hslToHex(info)),
+            error: hslToHex(error),
+            onError: this.getContrastColor(hslToHex(error)),
         }
     }
 }

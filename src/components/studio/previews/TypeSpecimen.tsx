@@ -2,7 +2,7 @@ export function TypeSpecimen() {
     return (
         <div className="p-12 space-y-12">
             <div>
-                <h1 className="text-6xl font-black mb-4" style={{ fontFamily: "var(--font-heading)" }}>Typography.</h1>
+                <h1 className="text-4xl md:text-6xl font-black mb-4" style={{ fontFamily: "var(--font-heading)" }}>Typography.</h1>
                 <p className="text-2xl text-muted-foreground max-w-2xl leading-relaxed">
                     A clear hierarchy is essential for readability and user experience.
                 </p>
@@ -12,15 +12,15 @@ export function TypeSpecimen() {
                 <div className="space-y-8">
                     <div className="space-y-2">
                         <span className="text-xs text-muted-foreground uppercase tracking-widest">Heading 1</span>
-                        <h1 className="text-5xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>The quick brown fox.</h1>
+                        <h1 className="text-3xl md:text-5xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>The quick brown fox.</h1>
                     </div>
                     <div className="space-y-2">
                         <span className="text-xs text-muted-foreground uppercase tracking-widest">Heading 2</span>
-                        <h2 className="text-4xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>Jumps over the lazy dog.</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>Jumps over the lazy dog.</h2>
                     </div>
                     <div className="space-y-2">
                         <span className="text-xs text-muted-foreground uppercase tracking-widest">Heading 3</span>
-                        <h3 className="text-3xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>Pack my box with five dozen.</h3>
+                        <h3 className="text-xl md:text-3xl font-bold" style={{ fontFamily: "var(--font-heading)" }}>Pack my box with five dozen.</h3>
                     </div>
                 </div>
 

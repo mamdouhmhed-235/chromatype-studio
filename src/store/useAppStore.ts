@@ -1,18 +1,21 @@
 import { create } from "zustand"
 import { PaletteGenerator, type Palette, type PaletteConstraints } from "../engine/palette"
 import { FontGenerator, type FontPairing, type FontVibe } from "../engine/fonts"
+import { TypographyGenerator, type TypeSystem, type TypographySettings } from "../engine/typography"
 
 interface AppState {
     seed: number
-    tab: "website" | "app" | "type" | "a11y"
+    tab: "website" | "app" | "dashboard" | "type" | "a11y"
 
     // Constraints
     paletteConstraints: PaletteConstraints
     fontVibe: FontVibe
+    typographySettings: TypographySettings
 
     // Data
     palette: Palette
     fonts: FontPairing
+    typography: TypeSystem
 
     // Locks (Set of keys to lock)
     lockedRoles: Set<keyof Palette>
@@ -22,11 +25,15 @@ interface AppState {
     setTab: (tab: AppState["tab"]) => void
     setPaletteConstraint: <K extends keyof PaletteConstraints>(key: K, value: PaletteConstraints[K]) => void
     setFontVibe: (vibe: FontVibe) => void
+    setTypographySetting: <K extends keyof TypographySettings>(key: K, value: TypographySettings[K]) => void
+
     togglePaletteLock: (key: keyof Palette) => void
     toggleFontLock: (key: keyof FontPairing) => void
+
     generate: () => void
     generatePalette: () => void
     generateFonts: () => void
+    generateTypography: () => void
     initFromUrl: () => void // TODO
 }
 
@@ -42,13 +49,24 @@ export const useAppStore = create<AppState>((set, get) => {
         saturation: "medium",
     }
 
+    const initialTypographySettings: TypographySettings = {
+        scale: "majorThird",
+        baseSize: 16,
+        lineHeight: "normal",
+        letterSpacing: "normal"
+    }
+
     return {
         seed: initialSeed,
         tab: "website",
         paletteConstraints: initialConstraints,
         fontVibe: "modern",
+        typographySettings: initialTypographySettings,
+
         palette: pGen.generate(initialConstraints),
         fonts: fGen.generate("modern"),
+        typography: TypographyGenerator.generate(initialTypographySettings),
+
         lockedRoles: new Set(),
         lockedFonts: new Set(),
 
@@ -58,11 +76,19 @@ export const useAppStore = create<AppState>((set, get) => {
             set((state) => ({
                 paletteConstraints: { ...state.paletteConstraints, [key]: value }
             }))
-            // Auto-regenerate on constraint change? Or wait for user?
-            // Usually better to wait or debounce. Let's wait for user or optional auto.
         },
 
         setFontVibe: (vibe) => set({ fontVibe: vibe }),
+
+        setTypographySetting: (key, value) => {
+            set((state) => {
+                const newSettings = { ...state.typographySettings, [key]: value }
+                return {
+                    typographySettings: newSettings,
+                    typography: TypographyGenerator.generate(newSettings)
+                }
+            })
+        },
 
         togglePaletteLock: (key) => set((state) => {
             const newLocks = new Set(state.lockedRoles)
@@ -81,6 +107,7 @@ export const useAppStore = create<AppState>((set, get) => {
         generate: () => {
             get().generatePalette()
             get().generateFonts()
+            // Typography usually doesn't need "regeneration" unless random, but effectively it's static config
         },
 
         generatePalette: () => {
@@ -102,7 +129,7 @@ export const useAppStore = create<AppState>((set, get) => {
         generateFonts: () => {
             const state = get()
             const newSeed = Math.floor(Math.random() * 1000000)
-            const fGen = new FontGenerator(newSeed) // Use same seed? or new?
+            const fGen = new FontGenerator(newSeed)
             const newFonts = fGen.generate(state.fontVibe)
 
             set((state) => {
@@ -113,8 +140,13 @@ export const useAppStore = create<AppState>((set, get) => {
             })
         },
 
+        generateTypography: () => {
+            const state = get()
+            set({ typography: TypographyGenerator.generate(state.typographySettings) })
+        },
+
         initFromUrl: () => {
-            // Placeholder for URL hydration
+            // Placeholder
         }
     }
 })

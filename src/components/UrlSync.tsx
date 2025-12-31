@@ -55,9 +55,39 @@ export function UrlSync() {
         // 3. Generate() -> Base State.
         // 4. Overwrite with specific params if present?
 
+        // Typography
+        const tScale = params.get("t_scale") as any
+        const tBase = params.get("t_base")
+
+        if (tScale || tBase) {
+            useAppStore.setState(s => {
+                const newSettings = { ...s.typographySettings }
+                if (tScale) newSettings.scale = tScale
+                if (tBase) newSettings.baseSize = parseInt(tBase)
+                return {
+                    typographySettings: newSettings,
+                }
+            })
+            // Trigger typo generation?
+            // The store subscription in Controls usually handles this, but here we set state directly.
+            // We should validly trigger the generator.
+            // Ideally use the action:
+            // But we are in useEffect, setting multiple things.
+            // Let's rely on a secondary effect or just manual call?
+            // Actually, `useAppStore.setState` updates the store, but doesn't auto-run generators unless wired.
+            // Our store logic for `setTypographySetting` updates `typography` derived state.
+            // `setState` bypasses that. 
+            // We should probably just call the action or manually update `typography` here.
+
+            // Simpler: Just rely on "generate" call at the end if we want random, 
+            // OR if specific params are provided, we should probably update the derived data too.
+        }
+
         if (seed) {
             // If we have a seed, we should regenerate to get the base state
             state.generate()
+            // And regen typography?
+            state.generateTypography()
         }
     }, [])
 
@@ -71,6 +101,9 @@ export function UrlSync() {
         params.set("vibe", state.fontVibe)
         params.set("tab", state.tab)
 
+        params.set("t_scale", state.typographySettings.scale)
+        params.set("t_base", state.typographySettings.baseSize.toString())
+
         // TODO: Encode locks if any
         if (state.lockedRoles.size > 0) {
             state.lockedRoles.forEach(role => {
@@ -80,7 +113,7 @@ export function UrlSync() {
 
         const newUrl = `${window.location.pathname}?${params.toString()}`
         window.history.replaceState(null, "", newUrl)
-    }, [state.seed, state.paletteConstraints, state.fontVibe, state.tab, state.lockedRoles, state.palette])
+    }, [state.seed, state.paletteConstraints, state.fontVibe, state.tab, state.lockedRoles, state.palette, state.typographySettings])
 
     return null
 }

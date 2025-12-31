@@ -7,6 +7,7 @@ import { WebsitePreview } from "./previews/WebsitePreview"
 import { AppPreview } from "./previews/AppPreview"
 import { TypeSpecimen } from "./previews/TypeSpecimen"
 import { A11yCheck } from "./previews/A11yCheck"
+import { DashboardPreview } from "./previews/DashboardPreview"
 import { hexToHsl, toCssHsl } from "@/engine/color"
 
 function mapPaletteToVars(palette: Palette, fontHeading: string, fontBody: string): React.CSSProperties {
@@ -46,18 +47,21 @@ export function PreviewCanvas() {
             </div>
 
             <div className="flex-shrink-0 border-b bg-muted/40 px-4 py-2 flex items-center justify-between">
-                <Tabs value={tab} onValueChange={(v: any) => setTab(v)}>
-                    <TabsList>
-                        <TabsTrigger value="website">Website</TabsTrigger>
-                        <TabsTrigger value="app">App UI</TabsTrigger>
-                        <TabsTrigger value="type">Typography</TabsTrigger>
-                        <TabsTrigger value="a11y">Accessibility</TabsTrigger>
-                    </TabsList>
+                <Tabs value={tab} onValueChange={(v: any) => setTab(v)} className="w-full">
+                    <div className="w-full overflow-x-auto pb-1 no-scrollbar">
+                        <TabsList className="w-full justify-start md:w-auto md:justify-center">
+                            <TabsTrigger value="website">Website</TabsTrigger>
+                            <TabsTrigger value="app">App UI</TabsTrigger>
+                            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                            <TabsTrigger value="type">Typography</TabsTrigger>
+                            <TabsTrigger value="a11y">Accessibility</TabsTrigger>
+                        </TabsList>
+                    </div>
                 </Tabs>
             </div>
 
             <div
-                className="flex-1 overflow-auto p-8 transition-colors duration-500"
+                className="flex-1 overflow-auto p-4 md:p-8 transition-colors duration-500"
                 style={style}
             >
                 {/* 
@@ -75,6 +79,7 @@ export function PreviewCanvas() {
                 >
                     {tab === "website" && <WebsitePreview />}
                     {tab === "app" && <AppPreview />}
+                    {tab === "dashboard" && <DashboardPreview />}
                     {tab === "type" && <TypeSpecimen />}
                     {tab === "a11y" && <A11yCheck />}
                 </div>

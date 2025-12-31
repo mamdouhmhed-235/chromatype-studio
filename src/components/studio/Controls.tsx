@@ -82,8 +82,11 @@ export function Controls() {
                             <SelectItem value="random">Random</SelectItem>
                             <SelectItem value="neutral">Neutral</SelectItem>
                             <SelectItem value="analogous">Analogous</SelectItem>
+                            <SelectItem value="monochromatic">Monochromatic</SelectItem>
                             <SelectItem value="complementary">Complementary</SelectItem>
+                            <SelectItem value="split-complementary">Split Complementary</SelectItem>
                             <SelectItem value="triadic">Triadic</SelectItem>
+                            <SelectItem value="tetradic">Tetradic (Double)</SelectItem>
                             <SelectItem value="compound">Compound</SelectItem>
                         </SelectContent>
                     </Select>
@@ -133,6 +136,46 @@ export function Controls() {
                             <SelectItem value="friendly">Friendly</SelectItem>
                         </SelectContent>
                     </Select>
+                </div>
+
+                {/* Typography Engine v2 Controls */}
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div className="space-y-2">
+                        <Label className="text-xs">Scale</Label>
+                        <Select
+                            value={useAppStore.getState().typographySettings.scale}
+                            onValueChange={(val: any) => useAppStore.getState().setTypographySetting("scale", val)}
+                        >
+                            <SelectTrigger className="h-8 text-xs">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="minorSecond">Minor 2nd (1.067)</SelectItem>
+                                <SelectItem value="majorSecond">Major 2nd (1.125)</SelectItem>
+                                <SelectItem value="majorThird">Major 3rd (1.250)</SelectItem>
+                                <SelectItem value="perfectFourth">Perf. 4th (1.333)</SelectItem>
+                                <SelectItem value="goldenRatio">Golden (1.618)</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label className="text-xs">Base Size</Label>
+                        <Select
+                            value={useAppStore.getState().typographySettings.baseSize.toString()}
+                            onValueChange={(val: any) => useAppStore.getState().setTypographySetting("baseSize", parseInt(val))}
+                        >
+                            <SelectTrigger className="h-8 text-xs">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="14">14px</SelectItem>
+                                <SelectItem value="16">16px</SelectItem>
+                                <SelectItem value="18">18px</SelectItem>
+                                <SelectItem value="20">20px</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </div>
 
