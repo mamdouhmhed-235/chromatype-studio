@@ -26,20 +26,18 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: chromatype-studio/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
-        working-directory: ./chromatype-studio
 
       - name: Build
         run: npm run build
-        working-directory: ./chromatype-studio
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./chromatype-studio/dist
+          path: ./dist
 
   deploy:
     environment:
