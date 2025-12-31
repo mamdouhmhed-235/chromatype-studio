@@ -1,0 +1,163 @@
+[
+    {
+        "name": "Inter",
+        "category": "sans-serif",
+        "weights": [
+            400,
+            600,
+            700
+        ],
+        "tags": [
+            "modern",
+            "neutral",
+            "tech",
+            "ui"
+        ]
+    },
+    {
+        "name": "Poppins",
+        "category": "sans-serif",
+        "weights": [
+            400,
+            600,
+            700
+        ],
+        "tags": [
+            "friendly",
+            "modern",
+            "geometric"
+        ]
+    },
+    {
+        "name": "Playfair Display",
+        "category": "serif",
+        "weights": [
+            400,
+            600,
+            700
+        ],
+        "tags": [
+            "editorial",
+            "classic",
+            "fashion"
+        ]
+    },
+    {
+        "name": "Merriweather",
+        "category": "serif",
+        "weights": [
+            300,
+            400,
+            700
+        ],
+        "tags": [
+            "classic",
+            "readable",
+            "editorial"
+        ]
+    },
+    {
+        "name": "Space Mono",
+        "category": "monospace",
+        "weights": [
+            400,
+            700
+        ],
+        "tags": [
+            "tech",
+            "coding",
+            "modern"
+        ]
+    },
+    {
+        "name": "Lora",
+        "category": "serif",
+        "weights": [
+            400,
+            600
+        ],
+        "tags": [
+            "classic",
+            "editorial",
+            "soft"
+        ]
+    },
+    {
+        "name": "Work Sans",
+        "category": "sans-serif",
+        "weights": [
+            400,
+            600
+        ],
+        "tags": [
+            "modern",
+            "neutral",
+            "utilitarian"
+        ]
+    },
+    {
+        "name": "Oswald",
+        "category": "sans-serif",
+        "weights": [
+            400,
+            500,
+            700
+        ],
+        "tags": [
+            "bold",
+            "condensed",
+            "display"
+        ]
+    },
+    {
+        "name": "Quicksand",
+        "category": "sans-serif",
+        "weights": [
+            400,
+            600
+        ],
+        "tags": [
+            "friendly",
+            "rounded",
+            "soft"
+        ]
+    },
+    {
+        "name": "Abril Fatface",
+        "category": "serif",
+        "weights": [
+            400
+        ],
+        "tags": [
+            "display",
+            "bold",
+            "classic"
+        ]
+    },
+    {
+        "name": "DM Sans",
+        "category": "sans-serif",
+        "weights": [
+            400,
+            500,
+            700
+        ],
+        "tags": [
+            "modern",
+            "ui",
+            "geometric"
+        ]
+    },
+    {
+        "name": "Inconsolata",
+        "category": "monospace",
+        "weights": [
+            400,
+            700
+        ],
+        "tags": [
+            "tech",
+            "coding"
+        ]
+    }
+]
